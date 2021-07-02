@@ -1,6 +1,6 @@
 @ECHO Off
 
-REM the below line clears thread status so that i don't inadvertently upload wrong file. This is a comment btw
+REM the below line  clears thread status so that i don't inadvertently upload wrong file. This is a comment btw
 
 SET /p commit_msg="Commit message: "
 git add .
