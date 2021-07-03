@@ -10,7 +10,7 @@ from pyperclip import copy as cp
 from variousRegexChecks import *
 import creds
 
-def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and there it shows the images out of5000 processed per month.
+def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and there it shows the images out of5000 procesed/ month.
     """
     Input: path to image file (str)
     Output: text found in image (str)
