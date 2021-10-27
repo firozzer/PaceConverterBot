@@ -1,4 +1,5 @@
-#!/usr/bin/python3
+#!/home/pi/redditScripts/paceconverterbot/venv/bin/python3
+
 
 import re, requests, threading, time, os, shutil, traceback
 from datetime import datetime
@@ -188,7 +189,7 @@ def checkPostsForAnImageWithPaceNComment(sub):
             # quit() # quit if ever a comment is made so that i don't spam the 10 min comment rule of reddit & get the bot dieded.
             time.sleep(20) # sleep long to avoid too many comments within short time
 
-os.chdir("/home/ubuntu/") # this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
+os.chdir(os.path.dirname(os.path.abspath(__file__))) #this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
 
 subs = ['ultrarunning', 'nikerunclub', 'strava', 'stravaactivities', 'stravaart', 'garmin', 'ultramarathon', 'trailrunning']
 #subs = ['garmin']

@@ -1,16 +1,11 @@
 import re, datetime, os, io, time
-try:
-    from PIL import Image
-except:
-    import Image
 
-import pytesseract
 from pyperclip import copy as cp
 
 from variousRegexChecks import *
 import creds
 
-def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and there it shows the images out of5000 procesed/ month.
+def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and there it shows the images out of /5000 processed per month.
     """
     Input: path to image file (str)
     Output: text found in image (str)
@@ -24,16 +19,14 @@ def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and ther
     # then i copied the code from here: https://docs.aws.amazon.com/rekognition/latest/dg/text-detecting-text-procedure.html and tried to bruteforce my way through it. Even this Getting Started code helped: https://docs.aws.amazon.com/rekognition/latest/dg/images-bytes.html
     # then i brute forced those codees and got errors for "region" and "creds not found". which were solved by the SO Gods, God blessem.
 
-    os.chdir("/home/ubuntu") # this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
+    os.chdir("/home/pi/redditScripts/paceconverterbot") # this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
 
     with open("nuOfTimesOCRused.txt") as f: 
         nuOfTimesOCRusedAndURLsBrowsed = f.read() # record my free usage of AWS Rekog, 5000 images a month is free then chargeable :OO Also recroding URLs that have already been processed so that if some error in code & it keeps looping on a specific URL, at least GCV usage isn't wasted.
     countAndURLSeparated = nuOfTimesOCRusedAndURLsBrowsed.split("\n")
     nuOfTimesOCRused = int(countAndURLSeparated[1]) # AWS Rekog usage is on the 2nd line, 1st line is GCV usage
-    if nuOfTimesOCRused > 1000: 
-        print("AAAAAAAAAAAAIIIIIIIIIIIIIIIILLLLLLLLLLLLLLAAAAAAAAAAAAAAAAAAAAAA AWS Rekog usage reached > 1000 images, limit is 5000 pm free :OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-    if nuOfTimesOCRused > 4000: 
-        print("AWS Rekog usage count reached 4000, suspending further processes until manual humanity override.")
+    if nuOfTimesOCRused > 4500: 
+        print("AWS Rekog usage count reached 4500, suspending further processes until manual humanity override.")
         return ""
 
     # startTime = datetime.datetime.now()
@@ -67,8 +60,8 @@ def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and ther
                 wordCount+=1
 
     if wordCount >= 49: # AWS Rekog has a limit of doing 50 words per image only.
-        print(">= 49 words detected. Letting GCV handle this one.")
-        return """~(^Let GCV handle this.$^#"""
+        print(">= 49 words detected. Skipping this image.")
+        return ""
 
     if extractedText == "": 
         print(f'No text detected in {imageURL}')
@@ -86,17 +79,14 @@ def detectTextUsingGoogleCloudVision(path, imageURL):
     import io, os
     from google.cloud import vision
     
-    os.chdir("/home/ubuntu") # this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
 
     with open("nuOfTimesOCRused.txt") as f: 
         nuOfTimesOCRusedAndURLsBrowsed = f.read() # record my free usage of GCV, 1000 images a month is free then chargeable $1.5 per imagee :OO Also recroding URLs that have already been processed so that if some error in code & it keeps looping on a specific URL, at least GCV usage isn't wasted.
     countAndURLSeparated = nuOfTimesOCRusedAndURLsBrowsed.split("\n")
     nuOfTimesOCRused = int(countAndURLSeparated[0])
-    if nuOfTimesOCRused > 900: 
-        print("AAAAAAAAAAAAIIIIIIIIIIIIIIIILLLLLLLLLLLLLLAAAAAAAAAAAAAAAAAAAAAA GCV usage reached > 900 images, limit is 1000 pm free :OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
     if nuOfTimesOCRused > 980: 
-        print("GCV count reached 980, suspending further GCV processes until manual humanity override.")
-        return ""
+        # print("GCV count reached 980, now letting AWS Rekog handle images.")
+        return "&*2^$9 GCV Limit reached @0%*3"
 
     # startTime = datetime.datetime.now()
     if f"{imageURL} gcv" in nuOfTimesOCRusedAndURLsBrowsed: # recording & checking AWS/GCV operation separately as in current model i'm using GCV ONLY if >49 words detected in image.
@@ -104,7 +94,7 @@ def detectTextUsingGoogleCloudVision(path, imageURL):
         return ""
     # endTime = datetime.datetime.now(); print(f"Time it took to check OCR'd URLs: {(str(endTime - startTime))[-9:]} secs")
 
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=r"/home/ubuntu/credsgcv.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=r"credsgcv.json"
     client = vision.ImageAnnotatorClient()
 
     with io.open(f"{path}.jpg", 'rb') as image_file:
@@ -141,31 +131,14 @@ def ocrTheImage(path, imageURL):
     Input: Image name/path without extension (str)
     Output: Comment for a Single image that has been processed (str) or empty str if nothing found
     """
-    #pytesseract.pytesseract.tesseract_cmd = r"D:\Program Files\Tesseract-OCR\tesseract.exe"
-    # extractedText = pytesseract.image_to_string(Image.open(f'{path}.jpg'))
-    # if checkStravaOrGarminSplitsPaceList(extractedText): #check firstly for this type of "Strava splits pace list" image as it false positively gets detected in the next line of regex
-    #     paceRegexedFromExtractedTextTypeList = re.findall(r"(splits).*?(mi|km).*?(pace)", extractedText, flags=re.IGNORECASE | re.DOTALL)
-    #     splitsPreFmtgStringified = ' '.join(paceRegexedFromExtractedTextTypeList[0]) # this is used later on to check if existing pace is km or miles
-    #     convertedPace = converPaceForStravaPaceList(extractedText, splitsPreFmtgStringified)
-    #     return convertedPace
-    # commentForThisImage = ("" + checkStrava1stVariation(extractedText)
-    #                     + checkGarmin1stVariation(extractedText) 
-    #                     + checkNike1stVariation(extractedText) 
-    #                     + checkForMPHorKPH(extractedText)
-    # )
 
-    # if commentForThisImage == "": # checks if this list is empty, which means either the pace on image is unextractable by Tesseract, or image doesn't contain any pace at all. So just double checking with GCV as last resort.
-    #     print("Trying Google Cloud Vision...")
-
-    #if os.path.getsize(f"{path}.jpg") <= 5_000_000: # if file size greater than 5 MB, return "" so that it continues to next image in post / next post
-        #extractedText = detectTextUsingAWSRekognition(path, imageURL)
-    #else:
-        #print("File size greater than 5 MB, AWS Rekog cannot accept it as it has a limit of 5 MB only. Continuing to next image/post.")
-    extractedText = """~(^Let GCV handle this.$^#"""
-
-    if extractedText == """~(^Let GCV handle this.$^#""":
-        # print("GCVVVVVVVVVVVVVVVV is handling this.")
-        extractedText = detectTextUsingGoogleCloudVision(path, imageURL)
+    extractedText = detectTextUsingGoogleCloudVision(path, imageURL)
+    if extractedText == "&*2^$9 GCV Limit reached @0%*3": # automatically using AWS Rekog if GCV limit reached
+        if os.path.getsize(f"{path}.jpg") <= 5_000_000: # if file size greater than 5 MB, return "" so that it continues to next image in post / next post
+            extractedText = detectTextUsingAWSRekognition(path, imageURL)
+        else:
+            print("File size greater than 5 MB, AWS Rekog cannot accept it as it has a limit of 5 MB only. Continuing to next image/post.")
+            return ""
 
     commentForThisImage = checkStravaOrGarminSplitsPaceList(extractedText) # checks for this kind of image first as it causes false positives in further code if not checked beforehand
     if commentForThisImage != "":
