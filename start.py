@@ -131,7 +131,7 @@ def checkPostsForAnImageWithPaceNComment(sub):
                     with open("nonPaceSubmissionsIDDB.txt", "a") as f:
                         f.write(f"{item['data']['id']} ")
                     continue
-
+            if item['data']['author'] == "lichuanyi": continue # skipping this guy's posts for now as his km/miles are in Chinese.
             if singleImagePost: # handles single image posts.
                 # print(f"Performing SingleImageReq request - {imageURL} - {time.ctime()}")
                 r = requests.get(imageURL) 
