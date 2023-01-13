@@ -14,6 +14,7 @@ import creds
 halfANewLine = "  \n" # don't use this as Reddit official app itself doesn't show it properly. but leaving it still just for future ref.
 newLine = "\n\n&#x200B;\n\n" # You can do this f"5 enters after this{newLine*5}5 enters before this" easily using this.
 horizontalLine = "\n\n---\n\n" # basically --- on a line by themselves in MD is a horizontal line/rule.
+SECS_TO_SLEEP_AFTER_COMMENTING = 10
 
 def send_message(message):
     url = f'https://api.telegram.org/bot{creds.bot_token}/sendMessage'
@@ -187,11 +188,11 @@ def checkPostsForAnImageWithPaceNComment(sub):
             with open("commentedSubmissionsIDDB.txt", "a") as f:
                     f.write(f"{item['data']['id']} ")
             # quit() # quit if ever a comment is made so that i don't spam the 10 min comment rule of reddit & get the bot dieded.
-            time.sleep(20) # sleep long to avoid too many comments within short time
+            time.sleep(SECS_TO_SLEEP_AFTER_COMMENTING) # sleep long to avoid too many comments within short time
 
 os.chdir(os.path.dirname(os.path.abspath(__file__))) #this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
 
-subs = ['ultrarunning', 'nikerunclub', 'strava', 'stravaactivities', 'stravaart', 'garmin', 'ultramarathon', 'trailrunning', 'polarfitness']
+subs = ['ultrarunning', 'nikerunclub', 'strava', 'stravaactivities', 'stravaart', 'garmin', 'ultramarathon', 'trailrunning', 'polarfitness', 'C25k', 'B210k', 'runninglifestyle']
 #subs = ['garmin']
 for sub in subs:
     checkPostsForAnImageWithPaceNComment(sub)
