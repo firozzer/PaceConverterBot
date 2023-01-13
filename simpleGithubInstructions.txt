@@ -1,0 +1,9 @@
+# seems like i made this long time ago no idea when & so this is probably outdated now, use existing knoweldge instead
+
+Say you made code changes & now want to update to the Github repo, do this:
+- Firstly clone Github repo by doing 'git clone url'.
+- Cut & put the .git folder that got downloaded into your new code folder.
+- Run 'git add .' (ensure .gitignore is proper) & 'git commit -m "coment"'. At this stage you can run 'git log' or to see status of your local & remote branch.
+- To push new code to Github: 'git push origin main -f' where 'origin' is remote name & 'main' is remote branch name. And -f does a force overwrite of everything on remote branch.
+- Done.
+

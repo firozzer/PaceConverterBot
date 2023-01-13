@@ -1,7 +1,21 @@
-/other
-creds.py
-credsgcv.json
-dn.bat
-PaceConverterBot_AWS_EC2_SSH_key.rar
-reddit.ppk
-up.bat
+# Ignore everything
+*
+
+# But not these files...
+!moveOutputFile.py
+!ocrNconvert.py
+!README.md
+!recordLastMonthStats.py
+!req.txt
+!simpleGithubInstructions.txt
+!start.py
+!variousRegexChecks.py
+# etc...
+
+# ...even if they are in subdirectories
+!*/
+
+# if the files to be tracked are in subdirectories
+!*/a/b/file1.txt
+!*/a/b/c/*
+

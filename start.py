@@ -191,7 +191,7 @@ def checkPostsForAnImageWithPaceNComment(sub):
 
 os.chdir(os.path.dirname(os.path.abspath(__file__))) #this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
 
-subs = ['ultrarunning', 'nikerunclub', 'strava', 'stravaactivities', 'stravaart', 'garmin', 'ultramarathon', 'trailrunning']
+subs = ['ultrarunning', 'nikerunclub', 'strava', 'stravaactivities', 'stravaart', 'garmin', 'ultramarathon', 'trailrunning', 'polarfitness']
 #subs = ['garmin']
 for sub in subs:
     checkPostsForAnImageWithPaceNComment(sub)

@@ -14,23 +14,21 @@ def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and ther
     """
     import base64, boto3 #boto3 is AWS Python API iThink
         
-    # to finally get it working, i followed the instrucs in AWS Rekog docs. Created an IAM user acc as per its instructions but realized was no need & could've done in my AWS root anyway, but as per their best practice it is better to create sepearte IAM accounts for specific tasks and limit the authority of the IAM accs to specific tasks like Rekog or EC2.
-    # currently i gave this Administrator IAM account full administrative rights so kinda doesn't make sense, better i give it access only to Rekognition API for it to be safer. Anyway, creating this IAM is optional, not really need to do it just best prac.
     # then i copied the code from here: https://docs.aws.amazon.com/rekognition/latest/dg/text-detecting-text-procedure.html and tried to bruteforce my way through it. Even this Getting Started code helped: https://docs.aws.amazon.com/rekognition/latest/dg/images-bytes.html
     # then i brute forced those codees and got errors for "region" and "creds not found". which were solved by the SO Gods, God blessem.
 
-    os.chdir("/home/pi/redditScripts/paceconverterbot") # this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
+    #os.chdir("/home/pi/redditScripts/paceconverterbot") # this is because script is running inside venv (on AWS), so creds.json & numberofTime.txt files don't get found if i don't do this.
 
     with open("nuOfTimesOCRused.txt") as f: 
         nuOfTimesOCRusedAndURLsBrowsed = f.read() # record my free usage of AWS Rekog, 5000 images a month is free then chargeable :OO Also recroding URLs that have already been processed so that if some error in code & it keeps looping on a specific URL, at least GCV usage isn't wasted.
     countAndURLSeparated = nuOfTimesOCRusedAndURLsBrowsed.split("\n")
     nuOfTimesOCRused = int(countAndURLSeparated[1]) # AWS Rekog usage is on the 2nd line, 1st line is GCV usage
-    if nuOfTimesOCRused > 4500: 
-        print("AWS Rekog usage count reached 4500, suspending further processes until manual humanity override.")
+    if nuOfTimesOCRused > 4800: 
+        print("AWS Rekog usage count reached 4800, suspending further processes until manual humanity override.")
         return ""
 
     # startTime = datetime.datetime.now()
-    if f"{imageURL} aws" in nuOfTimesOCRusedAndURLsBrowsed: # recording & checking AWS/GCV operation separately as in current model i'm using GCV ONLY if >49 words detected in image.
+    if f"{imageURL} aws" in nuOfTimesOCRusedAndURLsBrowsed: # recording & checking AWS/GCV operation separately 
         print("AWS Rekog being re-used for same image, check ID above & sort it out.")
         return ""
     # endTime = datetime.datetime.now(); print(f"Time it took to check OCR'd URLs: {(str(endTime - startTime))[-9:]} secs")
@@ -41,7 +39,7 @@ def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and ther
     # do the recording of URL & usage count BEFORE you make the call because sometimes call to AWS results in error which halts the script & so usage doesn't get recorded and worse it keeps doing the same URL again and again.
     nuOfTimesOCRused += 1
     countAndURLSeparated[1] = str(nuOfTimesOCRused)
-    countAndURLSeparated.append(imageURL + " aws") # recording & checking AWS/GCV operation separately as in current model i'm using GCV ONLY if >49 words detected in image.
+    countAndURLSeparated.append(imageURL + " aws") # recording & checking AWS/GCV operation separately 
     countAndURLSeparatedStringified = "\n".join(countAndURLSeparated)
     with open("nuOfTimesOCRused.txt", "w") as f: 
         f.write(countAndURLSeparatedStringified)
@@ -59,8 +57,8 @@ def detectTextUsingAWSRekognition(path, imageURL): # go to Billing page and ther
             if  text["Type"] == "WORD":
                 wordCount+=1
 
-    if wordCount >= 49: # AWS Rekog has a limit of doing 50 words per image only.
-        print(">= 49 words detected. Skipping this image.")
+    if wordCount >= 99: # AWS Rekog has a limit of doing 100 words per image only. If 100 words get detected means there might be more. & if there is more i'd rather skip the image than perform conversion using incomplete data
+        print(">= 99 words detected. Skipping this image.")
         return ""
 
     if extractedText == "": 
@@ -89,7 +87,7 @@ def detectTextUsingGoogleCloudVision(path, imageURL):
         return "&*2^$9 GCV Limit reached @0%*3"
 
     # startTime = datetime.datetime.now()
-    if f"{imageURL} gcv" in nuOfTimesOCRusedAndURLsBrowsed: # recording & checking AWS/GCV operation separately as in current model i'm using GCV ONLY if >49 words detected in image.
+    if f"{imageURL} gcv" in nuOfTimesOCRusedAndURLsBrowsed: # recording & checking AWS/GCV operation separately
         print("GCV being re-used for same image, check ID above & sort it out.")
         return ""
     # endTime = datetime.datetime.now(); print(f"Time it took to check OCR'd URLs: {(str(endTime - startTime))[-9:]} secs")
@@ -105,7 +103,7 @@ def detectTextUsingGoogleCloudVision(path, imageURL):
     # do the recording of URL & usage count BEFORE you make the call because sometimes call to GCV results in error which halts the script & so usage doesn't get recorded and worse it keeps doing the same URL again and again.    
     nuOfTimesOCRused += 1
     countAndURLSeparated[0] = str(nuOfTimesOCRused)
-    countAndURLSeparated.append(imageURL + " gcv") # recording & checking AWS/GCV operation separately as in current model i'm using GCV ONLY if >49 words detected in image.
+    countAndURLSeparated.append(imageURL + " gcv") # recording & checking AWS/GCV operation separately
     countAndURLSeparatedStringified = "\n".join(countAndURLSeparated)
     with open("nuOfTimesOCRused.txt", "w") as f: 
         f.write(countAndURLSeparatedStringified)

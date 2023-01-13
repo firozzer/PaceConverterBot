@@ -1,0 +1,5 @@
+praw
+inflect
+pyperclip
+google-cloud-vision
+boto3

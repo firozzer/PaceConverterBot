@@ -1,5 +1,7 @@
 #!/usr/bin/python3.8
 
+# i have no clue why i made this when i made this lmao
+
 import datetime, os, shutil, string
 
 today = datetime.datetime.now()
