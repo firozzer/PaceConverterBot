@@ -170,7 +170,7 @@ def checkNike1stVariation(extractedText):
             minsOfPace = int(digitsInpace[-4] + digitsInpace[-3]) 
         totSecsOfPace = (minsOfPace*60) + secsOfPace
         if totSecsOfPace <= 90 or totSecsOfPace > 2220: continue # +/- times from prev lap's pace get falsely detected, and these are usually less than 90 mins, so this check to skip them. Also 2220 is proper upper limit for /km to /mi secs conversion, if number is above that then further on it goes into hours and fudges up the result. And no sense in coding hour handling as obviously it is a wrong pace in the first place.
-        if "kilo" in extractedText.lower() or "km" in extractedText.lower() or "kм" in extractedText.lower(): # handling mins per km to mins per mile. that final M is a different m char lowercased, not the regular M.
+        if "kilo " in extractedText.lower() or "km" in extractedText.lower() or "kм" in extractedText.lower(): # handling mins per km to mins per mile. that final M is a different m char lowercased, not the regular M.
             paceUnitOfThisRedditPost = "kilo"
             totSecsOfPaceInMile = round(totSecsOfPace * 1.60934) # 1.6 km = 1 mile & rounding it up.
             paceInHMMSS = str(datetime.timedelta(seconds=totSecsOfPaceInMile)) # 90% OTTATT it comes in 0:00:00 format even if 0.
