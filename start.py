@@ -11,8 +11,8 @@ import creds
 
 
 # The below two are special ways to represent new lines on Reddit. The 'halfANewLine' is the one you reprodduce in the UI by pressing Shift+Enter, and in markdown it is technically called a new line within same para. The 'newLine' is the normal new line you get on pressing single Enter and it is called a new para techincally in md. Latter is useful when you need to insert multiple new lines.
-halfANewLine = "  \n" # don't use this as Reddit official app itself doesn't show it properly. but leaving it still just for future ref.
-newLine = "\n\n&#x200B;\n\n" # You can do this f"5 enters after this{newLine*5}5 enters before this" easily using this.
+halfANewLineAsPerReddit = "  \n" # don't use this as Reddit official app itself doesn't show it properly. but leaving it still just for future ref.
+newLineAsPerReddit = "\n\n&#x200B;\n\n" # You can do this f"5 enters after this{newLine*5}5 enters before this" easily using this.
 horizontalLine = "\n\n---\n\n" # basically --- on a line by themselves in MD is a horizontal line/rule.
 SECS_TO_SLEEP_AFTER_COMMENTING = 10
 
@@ -180,6 +180,8 @@ def checkPostsForAnImageWithPaceNComment(sub):
                 print(f"""r/{sub} No pace detected in: "{item['data']['title'][:35]}".""")
                 continue
             
+            commentToBeMade += newLineAsPerReddit + "https://paceconverter.netlify.app/"
+
             reddit = praw.Reddit(client_id=creds.client_id,client_secret=creds.client_secret,user_agent="PaceConverterBot", username=creds.username,password=creds.password)
             submissionToBeCommentedOn = reddit.submission(id=item['data']['id'])
             submissionToBeCommentedOn.reply(commentToBeMade)
